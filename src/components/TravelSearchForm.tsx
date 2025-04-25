@@ -1,20 +1,12 @@
 import React, { useState } from 'react';
-import { Calendar, ChevronDown } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import InterestSelector from './InterestSelector';
 
 const TravelSearchForm: React.FC = () => {
   const [destination, setDestination] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [tripLength, setTripLength] = useState('');
-  const [showTripLengthDropdown, setShowTripLengthDropdown] = useState(false);
-  
-  const tripLengthOptions = [
-    'Weekend (1-3 days)',
-    'Short trip (4-7 days)',
-    'Extended trip (1-2 weeks)',
-    'Long journey (2+ weeks)'
-  ];
+  const [budget, setBudget] = useState('');
 
   const handleGenerateItinerary = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +15,7 @@ const TravelSearchForm: React.FC = () => {
       destination,
       startDate,
       endDate,
-      tripLength
+      budget
     });
   };
 
@@ -58,7 +50,7 @@ const TravelSearchForm: React.FC = () => {
                   <input
                     type="date"
                     placeholder="Start date"
-                    className="w-full px-4 py-3 focus:ring-2 focus:ring-[#0F80DE] focus:border-transparent transition-all border-r border-gray-300"
+                    className="calender-input w-full px-4 py-3 focus:ring-2 focus:ring-[#0F80DE] focus:border-transparent transition-all border-r border-gray-300"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
                   />
@@ -68,7 +60,7 @@ const TravelSearchForm: React.FC = () => {
                   <input
                     type="date"
                     placeholder="End date"
-                    className="w-full px-4 py-3 focus:ring-2 focus:ring-[#0F80DE] focus:border-transparent transition-all"
+                    className="calender-input w-full px-4 py-3 focus:ring-2 focus:ring-[#0F80DE] focus:border-transparent transition-all"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
                   />
@@ -77,42 +69,20 @@ const TravelSearchForm: React.FC = () => {
               </div>
             </div>
 
-            {/* Trip Length */}
+            {/* Budget */}
             <div>
-              <label htmlFor="tripLength" className="block text-lg font-medium text-[#0F2B5B] mb-2">
-                Trip Length
+              <label htmlFor="budget" className="block text-lg font-medium text-[#0F2B5B] mb-2">
+                Budget ($)
               </label>
-              <div className="relative">
-                <button
-                  type="button"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-left flex justify-between items-center focus:ring-2 focus:ring-[#0F80DE] focus:border-transparent transition-all"
-                  onClick={() => setShowTripLengthDropdown(!showTripLengthDropdown)}
-                >
-                  <span className={tripLength ? 'text-gray-900' : 'text-gray-500'}>
-                    {tripLength || 'Select'}
-                  </span>
-                  <ChevronDown size={18} className="text-gray-400" />
-                </button>
-                
-                {showTripLengthDropdown && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
-                    <ul>
-                      {tripLengthOptions.map((option) => (
-                        <li
-                          key={option}
-                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
-                          onClick={() => {
-                            setTripLength(option);
-                            setShowTripLengthDropdown(false);
-                          }}
-                        >
-                          {option}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
+              <input
+                type="number"
+                id="budget"
+                placeholder="Enter your budget"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F80DE] focus:border-transparent transition-all"
+                value={budget}
+                onChange={(e) => setBudget(e.target.value)}
+                required
+              />
             </div>
           </div>
 
