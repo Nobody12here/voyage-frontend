@@ -10,18 +10,19 @@ const TravelSearchForm: React.FC = () => {
   const [budget, setBudget] = useState("");
   const [interests, setIntrests] = useState("");
 
-  const handleGenerateItinerary = (e: React.FormEvent) => {
+  const handleGenerateItinerary =async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const itineraryData: itineraryData = {
         destination,
-        startDate,
-        endDate,
+        start_date:startDate,
+        end_date:endDate,
         budget: parseFloat(budget),
-        intrests: interests,
+        intrests: [interests],
       };
       // Call the function to generate the itinerary with the data
-      const response = generateIterary(itineraryData);
+      const response = await generateIterary(itineraryData);
+      
       console.log("Generated Itinerary:", response);
     } catch (error) {
       console.error("Error generating itinerary:", error);
