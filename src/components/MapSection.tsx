@@ -1,43 +1,35 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import GoogleMap from "google-maps-react-markers";
-
-// Define the structure for our location data
-interface LocationData {
-  id: number;
-  lat: number;
-  lng: number;
-  title: string;
-  description: string;
-  show: boolean;
-}
+import { LocationData } from "../types";
+import { useLocationStore } from "../stores/locationStore";
 
 // Sample location data
-const initialLocations: Omit<LocationData, "show">[] = [
-  {
-    id: 1,
-    lat: 59.955413,
-    lng: 30.337844,
-    title: "Winter Palace",
-    description:
-      "The former imperial palace and current home of the Hermitage Museum, showcasing one of the world's largest art collections.",
-  },
-  {
-    id: 2,
-    lat: 59.93428,
-    lng: 30.335099,
-    title: "St. Isaac's Cathedral",
-    description:
-      "An impressive 19th-century cathedral with a golden dome, offering panoramic city views from its colonnade.",
-  },
-  {
-    id: 3,
-    lat: 59.940007,
-    lng: 30.315608,
-    title: "Peter and Paul Fortress",
-    description:
-      "The original citadel of St. Petersburg, containing the Peter and Paul Cathedral and the burial place of Russian emperors.",
-  },
-];
+// const initialLocations: Omit<LocationData, "show">[] = [
+//   {
+//     id: 1,
+//     lat: 59.955413,
+//     lng: 30.337844,
+//     title: "Winter Palace",
+//     description:
+//       "The former imperial palace and current home of the Hermitage Museum, showcasing one of the world's largest art collections.",
+//   },
+//   {
+//     id: 2,
+//     lat: 59.93428,
+//     lng: 30.335099,
+//     title: "St. Isaac's Cathedral",
+//     description:
+//       "An impressive 19th-century cathedral with a golden dome, offering panoramic city views from its colonnade.",
+//   },
+//   {
+//     id: 3,
+//     lat: 59.940007,
+//     lng: 30.315608,
+//     title: "Peter and Paul Fortress",
+//     description:
+//       "The original citadel of St. Petersburg, containing the Peter and Paul Cathedral and the burial place of Russian emperors.",
+//   },
+// ];
 
 // InfoWindow component
 const InfoWindow = ({ location }: { location: LocationData }) => {
@@ -109,17 +101,30 @@ const Marker = ({
   );
 };
 
-const MapSection: React.FC = () => {
+const MapSection: React.FC= () => {
+
   const [locations, setLocations] = useState<LocationData[]>([]);
+  const locationsData = useLocationStore((set)=>set.locations);
+  // Calculate a key that changes when locations are ready
+  const mapKey = useMemo(() => {
+    if (locations.length > 0) {
+      return `${locations[0].lat}-${locations[0].lng}`; // key based on center
+    }
+    return "default-map";
+  }, [locations]);
+  const center = locations && locations.length > 0
+  ? { lat: locations[0].lat, lng: locations[0].lng }
+  : {lat:0,lng:0};
+
   useEffect(() => {
     // Initialize locations with show: false
     setLocations(
-      initialLocations.map((location) => ({
+      locationsData.map((location) => ({
         ...location,
         show: false,
       }))
     );
-  }, []);
+  }, [locationsData]);
 
   // Handle marker click - toggle show property
   const handleMarkerClick = (key: number) => {
@@ -139,7 +144,8 @@ const MapSection: React.FC = () => {
           <div className="w-full h-96 relative">
             <GoogleMap
               apiKey="AIzaSyC3YHeB6cGNALtLHQkx5foNgvj3R_2SJCw"
-              defaultCenter={{ lat: 59.95, lng: 30.33 }}
+              defaultCenter={center}
+              key={mapKey}
               defaultZoom={11}
             >
               {locations.map((location) => (

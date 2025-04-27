@@ -1,29 +1,43 @@
 import React, { useState } from "react";
 import { Calendar } from "lucide-react";
 import { generateIterary } from "../api"; // Assuming you have a function to generate itinerary
-import { itineraryData } from "../types";
-
+import { itineraryData, LocationData } from "../types";
+import { useLocationStore } from "../stores/locationStore";
+import { toast } from "react-toastify";
 const TravelSearchForm: React.FC = () => {
   const [destination, setDestination] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [budget, setBudget] = useState("");
   const [interests, setIntrests] = useState("");
-
-  const handleGenerateItinerary =async (e: React.FormEvent) => {
+  const setLocations = useLocationStore((state) => state.setLocations);
+  const handleGenerateItinerary = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const itineraryData: itineraryData = {
         destination,
-        start_date:startDate,
-        end_date:endDate,
+        start_date: startDate,
+        end_date: endDate,
         budget: parseFloat(budget),
         intrests: [interests],
       };
       // Call the function to generate the itinerary with the data
-      const response = await generateIterary(itineraryData);
-      
-      console.log("Generated Itinerary:", response);
+      const response = generateIterary(itineraryData);
+      toast.promise(response, {
+        success: "Generated Sucessfully, Please look at the map!",
+        pending: "Processing....",
+        error: "An error occured:",
+      });
+      const transformedData: Omit<LocationData, "show">[] = (
+        await response
+      ).message.map((data, index) => ({
+        id: index + 1,
+        lat: data.location.latitude,
+        lng: data.location.longitude,
+        description: data.description,
+        title: data.city,
+      }));
+      setLocations(transformedData);
     } catch (error) {
       console.error("Error generating itinerary:", error);
     }
